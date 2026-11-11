@@ -2,3 +2,5 @@
 
 
 
+
+.preview-actions{display:flex;align-items:center;gap:4px}.preview-actions #download-button{font-weight:700;background:#f1e5df;border-radius:5px;padding:9px 11px}.preview-actions #download-button:hover{background:#ead7cf}@media(max-width:420px){.preview-actions{gap:0}.preview-actions .text-button{font-size:9px;padding:6px}.print-action{display:none}}
