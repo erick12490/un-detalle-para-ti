@@ -40,7 +40,7 @@ function renderQr() {
     qr.addData(makeSurpriseUrl(data), "Byte");
     qr.make();
     if (version === qrVersion) {
-      qrImage.src = qr.createDataURL(4, 2);
+      qrImage.src = qr.createDataURL(8, 4);
       status.textContent = "Tu mensaje y el enlace se guardan dentro del QR. No se suben a ningún servidor.";
     }
   } catch { status.textContent = "El mensaje o enlace es demasiado largo para el QR."; }
@@ -79,10 +79,10 @@ photoInput.addEventListener("change", () => {
 async function downloadCard() {
   if (!qrImage.src) { status.textContent = "Espera a que aparezca el código QR."; return; }
   const canvas = document.createElement("canvas");
-  canvas.width = 1080; canvas.height = 1350;
+  canvas.width = 1080; canvas.height = 1450;
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "#f8f5ef"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#fffdfa"; ctx.fillRect(90, 60, 900, 1230);
+  ctx.fillStyle = "#fffdfa"; ctx.fillRect(90, 60, 900, 1330);
   const drawCover = (img, x, y, w, h) => {
     const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
     const sw = w / scale, sh = h / scale;
@@ -96,10 +96,11 @@ async function downloadCard() {
   ctx.fillStyle = "#898074"; ctx.font = "italic 28px Georgia"; ctx.fillText("Con cariño,", 145, 1090);
   ctx.fillStyle = "#65564b"; ctx.font = "bold 30px Georgia"; ctx.fillText(getData().from.slice(0, 28), 145, 1135);
   if (qrImage.complete && qrImage.naturalWidth) {
-    ctx.fillStyle = "#ffffff"; ctx.fillRect(735, 1030, 180, 180);
-    ctx.drawImage(qrImage, 745, 1040, 160, 160);
-    ctx.fillStyle = "#8a796d"; ctx.font = "bold 15px Arial"; ctx.textAlign = "center";
-    ctx.fillText("ESCANÉAME", 825, 1228); ctx.textAlign = "left";
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(680, 1025, 270, 300);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(qrImage, 690, 1035, 250, 250);
+    ctx.fillStyle = "#8a796d"; ctx.font = "bold 16px Arial"; ctx.textAlign = "center";
+    ctx.fillText("ESCANÉAME", 815, 1310); ctx.textAlign = "left";
   }
   const link = document.createElement("a");
   link.download = "tarjeta-para-whatsapp.png";
