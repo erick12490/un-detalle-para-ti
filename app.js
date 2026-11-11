@@ -12,18 +12,11 @@ const status = document.querySelector("#status");
 const qrImage = document.querySelector("#qr-image");
 let photoUrl = "";
 let qrVersion = 0;
-
 function clean(value) { return value.trim().replace(/\s+/g, " "); }
-function getData() {
-  return { to: clean(toInput.value) || "Ti", from: clean(fromInput.value) || "Alguien que te quiere", message: messageInput.value.trim() || "Te quiero mucho. ♡", url: cleanUrl(urlInput.value) };
-}
-function cleanUrl(value) {
-  try { const url = new URL(value.trim()); return ["https:", "http:"].includes(url.protocol) ? url.href : ""; }
-  catch { return ""; }
-}
+function getData() { return { to: clean(toInput.value) || "Ti", from: clean(fromInput.value) || "Alguien que te quiere", message: messageInput.value.trim() || "Te quiero mucho. ♡", url: cleanUrl(urlInput.value) }; }
+function cleanUrl(value) { try { const url = new URL(value.trim()); return ["https:", "http:"].includes(url.protocol) ? url.href : ""; } catch { return ""; } }
 function makeSurpriseUrl(data) {
-  const payload = btoa(unescape(encodeURIComponent(JSON.stringify(data))))
-    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const payload = btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   const url = new URL(window.location.href);
   url.hash = "sorpresa=" + payload;
   return url.href;
@@ -37,12 +30,8 @@ function renderQr() {
   if (!window.qrcode) { status.textContent = "Conéctate a internet para generar el QR."; return; }
   try {
     const qr = qrcode(0, "M");
-    qr.addData(makeSurpriseUrl(data), "Byte");
-    qr.make();
-    if (version === qrVersion) {
-      qrImage.src = qr.createDataURL(4, 2);
-      status.textContent = "Tu mensaje y el enlace se guardan dentro del QR. No se suben a ningún servidor.";
-    }
+    qr.addData(makeSurpriseUrl(data), "Byte"); qr.make();
+    if (version === qrVersion) { qrImage.src = qr.createDataURL(4, 2); status.textContent = "Tu mensaje y el enlace se guardan dentro del QR. No se suben a ningún servidor."; }
   } catch { status.textContent = "El mensaje o enlace es demasiado largo para el QR."; }
 }
 function showSurprise() {
@@ -50,13 +39,12 @@ function showSurprise() {
   try {
     const encoded = new URLSearchParams(window.location.hash.slice(1)).get("sorpresa");
     if (!encoded) return false;
-    const base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+    const base64 = encoded.replace(/ /g, "+").replace(/-/g, "+").replace(/_/g, "/");
     const padded = base64 + "=".repeat((4 - base64.length % 4) % 4);
     data = JSON.parse(decodeURIComponent(escape(atob(padded))));
     if (!data || typeof data.message !== "string") return false;
   } catch { return false; }
-  creator.hidden = true;
-  surprise.hidden = false;
+  creator.hidden = true; surprise.hidden = false;
   document.title = "Una nota para " + (data.to || "ti");
   document.querySelector("#surprise-to").textContent = data.to || "Ti";
   document.querySelector("#surprise-from").textContent = data.from || "Alguien que te quiere";
@@ -68,13 +56,9 @@ function showSurprise() {
 }
 form.addEventListener("input", renderQr);
 photoInput.addEventListener("change", () => {
-  const file = photoInput.files && photoInput.files[0];
-  if (!file) return;
+  const file = photoInput.files && photoInput.files[0]; if (!file) return;
   if (photoUrl) URL.revokeObjectURL(photoUrl);
-  photoUrl = URL.createObjectURL(file);
-  photo.src = photoUrl;
-  photo.hidden = false;
-  placeholder.hidden = true;
+  photoUrl = URL.createObjectURL(file); photo.src = photoUrl; photo.hidden = false; placeholder.hidden = true;
 });
 document.querySelector("#print-button").addEventListener("click", () => window.print());
 if (!showSurprise()) renderQr();
