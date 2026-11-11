@@ -102,10 +102,23 @@ async function downloadCard() {
     ctx.fillStyle = "#8a796d"; ctx.font = "bold 16px Arial"; ctx.textAlign = "center";
     ctx.fillText("ESCANÉAME", 815, 1310); ctx.textAlign = "left";
   }
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+  if (!blob) { status.textContent = "No se pudo crear la imagen. Inténtalo otra vez."; return; }
+  const file = new File([blob], "tarjeta-para-whatsapp.png", { type: "image/png" });
+  if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+    try {
+      await navigator.share({ files: [file], title: "Un detalle para ti" });
+      status.textContent = "Tarjeta lista para compartir desde tu celular.";
+      return;
+    } catch (error) {
+      if (error && error.name === "AbortError") return;
+    }
+  }
   const link = document.createElement("a");
-  link.download = "tarjeta-para-whatsapp.png";
-  link.href = canvas.toDataURL("image/png");
+  link.download = file.name;
+  link.href = URL.createObjectURL(blob);
   link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 10000);
   status.textContent = "Tarjeta descargada como imagen PNG. Ya puedes enviarla por WhatsApp.";
 }
 document.querySelector("#download-button").addEventListener("click", downloadCard);
